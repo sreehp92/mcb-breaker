@@ -1662,15 +1662,14 @@ syncWithServer();
         function updateBoardWithServer(data) {
             if (!data || !data.services) return;
 
-            // 1. இணையம் மீண்டும் கிடைத்தவுடன், அனைத்து சுவிட்சுகளையும் முதலில் இயல்பு நிலைக்கு (ON) திருப்புகிறோம்
+            // 1. அனைத்து 34 சுவிட்சுகளையும் நேரடியாக ஸ்கிரீனில் ON (பச்சை) செய்கிறோம்
             mcbData.forEach(tier => {
                 tier.breakers.forEach(b => {
-                    b.state = true;
+                    setBreakerState(tier.id, b.id, true);
                 });
             });
 
             // 2. சர்வரிலிருந்து லைவாக வரும் 9 முக்கிய சேவைகளின் துல்லியமான நிலையை பொருத்துகிறோம்
-            // Tier 1 & 2: Nginx & Storage
             if (data.services['web-nginx']) {
                 setBreakerState('tier-core', 'web-nginx', data.services['web-nginx'].active);
             }
@@ -1695,10 +1694,13 @@ syncWithServer();
                 setBreakerState('tier-portals', id, portalActive);
             });
 
-            // 3. உடனடி லைவ் ஸ்கிரீன் அப்டேட் - அனைத்து 34 சுவிட்சுகளும் கண்முன்னே பச்சை நிறத்திற்கு மாறும்!
+            if (serverWasDown) {
+                logMessage("SERVER-RECOVER", "சர்வர் தொடர்பு மீண்டும் கிடைத்தது! அனைத்து சுவிட்சுகளும் லைவாக இயல்பு நிலைக்கு மாற்றப்பட்டன.", "emerald");
+                serverWasDown = false;
+            }
+
             renderBoard();
         }
-
         let failureCount = 0;
 
         async function syncWithServer() {
