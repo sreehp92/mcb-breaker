@@ -1464,10 +1464,6 @@ function updateBoardWithServer(data) {
     renderBoard();
 }
 
-// 3 வினாடிக்கு ஒருமுறை சர்வரோடு தொடர்ச்சியாக ஒத்திசைக்க
-setInterval(syncWithServer, 3000);
-syncWithServer();
-
         // -------------------------------------------------------------------------
         // 8. LOGGING & METRICS
         // -------------------------------------------------------------------------
@@ -1599,9 +1595,6 @@ syncWithServer();
             renderBoard();
             logMessage("KERNEL", "Proxmox Linux 6.8-pve kernel booted.", "emerald");
             logMessage("FAIL-SAFE", "Fail-safe watchdog active (3s timeout cutoff).", "cyan");
-
-            syncWithServer();
-            setInterval(syncWithServer, 3000);
         });
 
         // -------------------------------------------------------------------------
