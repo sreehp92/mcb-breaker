@@ -1,0 +1,1815 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enterprise Server MCB Distribution Board | அல்டிமேட் சர்வர் சர்க்யூட் பிரேக்கர் போர்டு</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+        :root {
+            --bg-metal-dark: #07090e;
+            --panel-frame: #111722;
+            --din-rail-highlight: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-metal-dark);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(30, 58, 138, 0.18) 0%, transparent 65%),
+                linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+            background-size: 100% 100%, 24px 24px, 24px 24px;
+        }
+
+        .font-mono-tech {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .font-display {
+            font-family: 'Chakra Petch', sans-serif;
+        }
+
+        /* Industrial Enclosure Exterior Styling */
+        .db-cabinet-shell {
+            background: linear-gradient(145deg, #161f2e 0%, #0b111a 100%);
+            box-shadow: 
+                0 0 0 2px #334155,
+                0 25px 60px -15px rgba(0, 0, 0, 0.85),
+                inset 0 1px 1px rgba(255, 255, 255, 0.15);
+        }
+
+        /* Realistic Steel DIN Rail Bar */
+        .din-steel-rail {
+            background: linear-gradient(180deg, #334155 0%, #64748b 25%, #cbd5e1 50%, #475569 75%, #1e293b 100%);
+            box-shadow: inset 0 2px 3px rgba(255,255,255,0.6), 0 6px 12px rgba(0,0,0,0.6);
+            height: 14px;
+        }
+
+        /* Compact Modular MCB Housing */
+        .compact-mcb-casing {
+            background: linear-gradient(180deg, #1c2638 0%, #0c1422 100%);
+            border: 1px solid #334155;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.45), inset 0 1px 1px rgba(255, 255, 255, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .compact-mcb-casing.tripped-glow {
+            border-color: #ef4444;
+            box-shadow: 0 0 14px rgba(239, 68, 68, 0.35);
+            background: linear-gradient(180deg, #2a151b 0%, #11090d 100%);
+        }
+
+        .mcb-rocker-slot {
+            background: #030712;
+            box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.95);
+        }
+
+        /* MCB Tactile Lever Switch */
+        .mcb-tactile-switch {
+            transition: all 0.22s cubic-bezier(0.2, 1.4, 0.5, 1);
+            user-select: none;
+        }
+
+        /* Lever State: ON (Flipped UP) */
+        .lever-state-on {
+            transform: translateY(-9px);
+            background: linear-gradient(180deg, #10b981 0%, #047857 70%, #064e3b 100%);
+            box-shadow: 0 6px 10px rgba(16, 185, 129, 0.45), inset 0 1px 2px rgba(255,255,255,0.6);
+            border: 1px solid #34d399;
+        }
+
+        /* Lever State: OFF / TRIPPED (Dropped DOWN) */
+        .lever-state-off {
+            transform: translateY(9px);
+            background: linear-gradient(180deg, #ef4444 0%, #b91c1c 70%, #7f1d1d 100%);
+            box-shadow: 0 3px 8px rgba(239, 68, 68, 0.45), inset 0 1px 2px rgba(255,255,255,0.3);
+            border: 1px solid #f87171;
+        }
+
+        /* Indicator LEDs */
+        .led-lamp-live {
+            background-color: #10b981;
+            box-shadow: 0 0 8px #10b981, 0 0 16px rgba(16, 185, 129, 0.7);
+        }
+
+        .led-lamp-trip {
+            background-color: #ef4444;
+            box-shadow: 0 0 8px #ef4444, 0 0 16px rgba(239, 68, 68, 0.85);
+            animation: pulse-trip 0.8s infinite;
+        }
+
+        @keyframes pulse-trip {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.92); }
+        }
+
+        .warning-stripe-tape {
+            background: repeating-linear-gradient(
+                -45deg,
+                #d97706,
+                #d97706 12px,
+                #111827 12px,
+                #111827 24px
+            );
+        }
+
+        .screw-head-3d {
+            background: radial-gradient(circle, #64748b 25%, #334155 70%, #1e293b 100%);
+            border: 1px solid #475569;
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.4), 0 1px 3px rgba(0,0,0,0.8);
+        }
+
+        #terminal-logs::-webkit-scrollbar,
+        #runbook-modal::-webkit-scrollbar {
+            width: 6px;
+        }
+        #terminal-logs::-webkit-scrollbar-track,
+        #runbook-modal::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        #terminal-logs::-webkit-scrollbar-thumb,
+        #runbook-modal::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col p-2 sm:p-4 lg:p-6 select-none">
+
+    <!-- Top Industrial Electrical Cabinet Header -->
+    <header class="max-w-[1780px] w-full mx-auto mb-4">
+        <div class="db-cabinet-shell rounded-2xl p-4 lg:p-5 relative border border-slate-700/80">
+            <div class="h-2 w-full warning-stripe-tape rounded-t-md mb-3 opacity-90"></div>
+            
+            <div class="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4">
+                <!-- Branding & Title -->
+                <div class="flex items-center gap-3.5">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 border-2 border-amber-500/50 flex items-center justify-center text-amber-400 shadow-lg shadow-amber-500/20 shrink-0">
+                        <i data-lucide="zap" class="w-6 h-6 animate-pulse"></i>
+                    </div>
+                    <div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <h1 id="i18n-main-title" class="text-lg sm:text-2xl font-black font-display tracking-wider uppercase text-white">
+                                ENTERPRISE SERVER MCB DISTRIBUTION BOARD
+                            </h1>
+                            <span class="text-[10px] font-mono-tech px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 font-bold tracking-widest uppercase">
+                                MAIN BUS LIVE
+                            </span>
+                            <span class="text-[10px] font-mono-tech px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/40 font-bold tracking-widest uppercase">
+                                9 TIERS / 34 BREAKERS
+                            </span>
+                        </div>
+                        <p id="i18n-main-subtitle" class="text-xs sm:text-sm text-slate-400 mt-0.5">
+                            மின்னணு குறுக்கு-சுற்று பலகை • அனைத்து சேவைகள், இணையதளங்கள், ஹார்ட் டிரைவ்கள் & ஆஃப்லைன் தீர்வுகள்
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Live Vitals & Action Controls -->
+                <div class="flex flex-wrap items-center gap-2 sm:gap-2.5 w-full xl:w-auto justify-start xl:justify-end">
+                    <!-- Real-time Electrical & Server Telemetry Vitals -->
+                    <div class="flex items-center gap-2.5 sm:gap-3 bg-slate-950/90 border border-slate-800 rounded-xl px-3 py-1.5 sm:py-2 font-mono-tech text-xs shadow-inner">
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-500 text-[10px]">GRID:</span>
+                            <span id="stat-voltage" class="text-amber-400 font-bold">234V AC</span>
+                        </div>
+                        <div class="w-px h-3.5 bg-slate-800"></div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-500 text-[10px]">LOAD:</span>
+                            <span id="stat-load" class="text-emerald-400 font-bold">7.45A</span>
+                        </div>
+                        <div class="w-px h-3.5 bg-slate-800"></div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-500 text-[10px]">TEMP:</span>
+                            <span id="stat-temp" class="text-cyan-400 font-bold">42°C</span>
+                        </div>
+                        <div class="w-px h-3.5 bg-slate-800"></div>
+                        <div class="flex items-center gap-1.5">
+                            <span class="text-slate-500 text-[10px]">TRIPPED:</span>
+                            <span id="stat-tripped-count" class="text-rose-400 font-bold">0 / 34</span>
+                        </div>
+                    </div>
+
+                    <!-- Offline Emergency Runbook Modal Trigger -->
+                    <button onclick="openRunbookModal()" class="px-3 py-2 bg-rose-950/60 hover:bg-rose-900/80 border border-rose-500/60 rounded-xl text-xs font-bold text-rose-300 flex items-center gap-1.5 transition active:scale-95 cursor-pointer shadow-lg shadow-rose-950/50">
+                        <i data-lucide="book-open" class="w-4 h-4 text-rose-400"></i>
+                        <span id="i18n-runbook-btn">ஆஃப்லைன் கையேடு (RUNBOOK)</span>
+                    </button>
+
+                    <!-- Sound Toggle Button -->
+                    <button id="sound-btn" onclick="toggleAudio()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 cursor-pointer text-slate-300" title="Mechanical MCB Click Audio">
+                        <i data-lucide="volume-2" id="sound-icon" class="w-4 h-4 text-emerald-400"></i>
+                        <span id="sound-label" class="font-mono-tech text-[11px]">AUDIO ON</span>
+                    </button>
+
+                    <!-- Language Switcher -->
+                    <button onclick="toggleLang()" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 cursor-pointer text-slate-200">
+                        <i data-lucide="languages" class="w-4 h-4 text-amber-400"></i>
+                        <span id="lang-btn-text">English Mode</span>
+                    </button>
+
+                    <!-- Reset All Breakers Master Switch -->
+                    <button onclick="resetEveryBreaker()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold font-mono-tech text-xs rounded-xl flex items-center gap-1.5 shadow-lg shadow-emerald-950 transition active:scale-95 cursor-pointer">
+                        <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                        <span id="i18n-reset-all">RESET ALL BREAKERS</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1780px] w-full mx-auto space-y-5 flex-grow">
+        
+        <!-- Search & Filter Rail Bar -->
+        <div class="db-cabinet-shell rounded-xl p-3 border border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs font-mono-tech">
+            <div class="flex items-center gap-2 flex-grow max-w-md bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800">
+                <i data-lucide="search" class="w-4 h-4 text-slate-400"></i>
+                <input 
+                    type="text" 
+                    id="search-input" 
+                    placeholder="சுவிட்ச் பெயர் அல்லது சேவையை தேடுங்கள் (eg: nginx, hdd, waffle, backup)..." 
+                    oninput="filterBreakers()"
+                    class="bg-transparent border-none text-slate-200 placeholder-slate-500 focus:outline-none w-full text-xs font-sans"
+                />
+            </div>
+            <div class="flex items-center gap-2 flex-wrap">
+                <button onclick="filterByTier('all')" class="px-2.5 py-1 rounded bg-slate-800 text-slate-300 hover:bg-slate-700 cursor-pointer font-bold tier-filter-btn" data-tier="all">ALL (34)</button>
+                <button onclick="filterByTier('tier-power')" class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn" data-tier="tier-power">POWER</button>
+                <button onclick="filterByTier('tier-storage')" class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn" data-tier="tier-storage">STORAGE</button>
+                <button onclick="filterByTier('tier-web')" class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn" data-tier="tier-web">WEB</button>
+                <button onclick="filterByTier('tier-net')" class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn" data-tier="tier-net">NETWORK</button>
+                <button onclick="filterByTier('tier-db')" class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn" data-tier="tier-db">DB & n8n</button>
+                <button onclick="filterByTier('tier-portals')" class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn" data-tier="tier-portals">PORTALS (6)</button>
+                <button onclick="filterByTier('tier-hardware')" class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn" data-tier="tier-hardware">HARDWARE</button>
+                <button onclick="filterByTier('tier-sec')" class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn" data-tier="tier-sec">SECURITY</button>
+                <button onclick="filterByTier('tier-backup')" class="px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn" data-tier="tier-backup">BACKUP</button>
+            </div>
+        </div>
+
+        <!-- Enclosure Frame with Rail Tiers -->
+        <div class="db-cabinet-shell rounded-2xl p-4 sm:p-6 border-2 border-slate-700 relative shadow-2xl">
+            <!-- Steel Corner Mounting Screws -->
+            <div class="absolute top-3 left-3 w-3.5 h-3.5 rounded-full screw-head-3d flex items-center justify-center">
+                <div class="w-2 h-0.5 bg-slate-900"></div>
+            </div>
+            <div class="absolute top-3 right-3 w-3.5 h-3.5 rounded-full screw-head-3d flex items-center justify-center">
+                <div class="w-2 h-0.5 bg-slate-900"></div>
+            </div>
+            <div class="absolute bottom-3 left-3 w-3.5 h-3.5 rounded-full screw-head-3d flex items-center justify-center">
+                <div class="w-2 h-0.5 bg-slate-900"></div>
+            </div>
+            <div class="absolute bottom-3 right-3 w-3.5 h-3.5 rounded-full screw-head-3d flex items-center justify-center">
+                <div class="w-2 h-0.5 bg-slate-900"></div>
+            </div>
+
+            <!-- Distribution Panel Header -->
+            <div class="flex flex-wrap items-center justify-between pb-3 mb-4 border-b border-slate-800 text-xs font-mono-tech text-slate-400">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span class="text-slate-200 font-bold uppercase tracking-wider">DIN EN 60715 HEAVY DUTY STEEL RACKS (TIERS 01 - 09)</span>
+                </div>
+                <div class="flex items-center gap-4 text-[11px]">
+                    <span class="text-amber-400">AUTONOMOUS FAIL-SAFE ON</span>
+                    <span class="text-slate-500">PROXMOX VE 8.2 / LINUX KERNEL 6.8</span>
+                </div>
+            </div>
+
+            <!-- Categorized Rails Container -->
+            <div id="rails-container" class="space-y-6">
+                <!-- Javascript will dynamically inject all 9 functional tiers here -->
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+            
+            <!-- Left: Expanded Chaos Testing / Fault Injector Station (5 Cols) -->
+            <div class="lg:col-span-5 db-cabinet-shell rounded-2xl p-4 sm:p-5 border border-slate-800 space-y-3.5 shadow-xl">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="flame" class="w-4 h-4 text-rose-500"></i>
+                        <h2 id="i18n-chaos-heading" class="text-xs sm:text-sm font-bold uppercase font-mono-tech tracking-wider text-slate-200">
+                            செயற்கை கோளாறு பரிசோதனை (CHAOS FAULT INJECTOR)
+                        </h2>
+                    </div>
+                    <span class="text-[10px] font-mono-tech text-rose-400 font-bold">10 FAILURE DRILLS</span>
+                </div>
+
+                <p id="i18n-chaos-subtext" class="text-[11px] text-slate-400">
+                    சர்வரில் நிஜமாக நடக்கும் கோளாறுகளை கிளிக் செய்து சோதிக்கவும். சுவிட்ச் உடனே ட்ரிப் ஆகி அலாரமிடும்:
+                </p>
+
+                <!-- Drill Action Buttons Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <!-- Power Cut -->
+                    <button onclick="injectChaos('power')" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-amber-500/50 rounded-xl text-left transition flex items-center gap-2.5 cursor-pointer group active:scale-98">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 group-hover:scale-110 transition shrink-0">
+                            <i data-lucide="zap-off" class="w-4 h-4"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="text-xs font-bold text-slate-200 truncate">மின் தடை (Power Cut)</div>
+                            <div class="text-[10px] text-slate-400 truncate">UPS & 40A Main Bus</div>
+                        </div>
+                    </button>
+
+                    <!-- HDD Drop -->
+                    <button onclick="injectChaos('hdd')" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-rose-500/50 rounded-xl text-left transition flex items-center gap-2.5 cursor-pointer group active:scale-98">
+                        <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400 group-hover:scale-110 transition shrink-0">
+                            <i data-lucide="hard-drive" class="w-4 h-4"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="text-xs font-bold text-slate-200 truncate">HDD அன்மவுண்ட் (I/O)</div>
+                            <div class="text-[10px] text-slate-400 truncate">/mnt/storage disconnected</div>
+                        </div>
+                    </button>
+
+                    <!-- Disk 100% Full -->
+                    <button onclick="injectChaos('disk-full')" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-rose-500/50 rounded-xl text-left transition flex items-center gap-2.5 cursor-pointer group active:scale-98">
+                        <div class="w-8 h-8 rounded-lg bg-rose-500/10 flex items-center justify-center text-rose-400 group-hover:scale-110 transition shrink-0">
+                            <i data-lucide="alert-octagon" class="w-4 h-4"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="text-xs font-bold text-slate-200 truncate">வட்டு 100% நிறைந்தது</div>
+                            <div class="text-[10px] text-slate-400 truncate">No space left on device</div>
+                        </div>
+                    </button>
+
+                    <!-- Web 502 Crash -->
+                    <button onclick="injectChaos('web')" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-500/50 rounded-xl text-left transition flex items-center gap-2.5 cursor-pointer group active:scale-98">
+                        <div class="w-8 h-8 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400 group-hover:scale-110 transition shrink-0">
+                            <i data-lucide="globe" class="w-4 h-4"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="text-xs font-bold text-slate-200 truncate">இணையதளம் 502 பிழை</div>
+                            <div class="text-[10px] text-slate-400 truncate">Nginx & Portals Down</div>
+                        </div>
+                    </button>
+
+                    <!-- Cloudflare Tunnel Drop -->
+                    <button onclick="injectChaos('tunnel')" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-amber-500/50 rounded-xl text-left transition flex items-center gap-2.5 cursor-pointer group active:scale-98">
+                        <div class="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400 group-hover:scale-110 transition shrink-0">
+                            <i data-lucide="radio" class="w-4 h-4"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="text-xs font-bold text-slate-200 truncate">டன்னல் துண்டிப்பு</div>
+                            <div class="text-[10px] text-slate-400 truncate">cloudflared Quic timeout</div>
+                        </div>
+                    </button>
+
+                    <!-- RAM OOM Killer -->
+                    <button onclick="injectChaos('oom')" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-purple-500/50 rounded-xl text-left transition flex items-center gap-2.5 cursor-pointer group active:scale-98">
+                        <div class="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover:scale-110 transition shrink-0">
+                            <i data-lucide="cpu" class="w-4 h-4"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="text-xs font-bold text-slate-200 truncate">மெமரி ஓவர்லோட் (OOM)</div>
+                            <div class="text-[10px] text-slate-400 truncate">Kernel killed Postgres/n8n</div>
+                        </div>
+                    </button>
+
+                    <!-- SSH Brute Force Attack -->
+                    <button onclick="injectChaos('ssh-brute')" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-red-500/50 rounded-xl text-left transition flex items-center gap-2.5 cursor-pointer group active:scale-98">
+                        <div class="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 group-hover:scale-110 transition shrink-0">
+                            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="text-xs font-bold text-slate-200 truncate">SSH ஊடுருவல் தாக்குதல்</div>
+                            <div class="text-[10px] text-slate-400 truncate">Fail2ban blocked 22 IP</div>
+                        </div>
+                    </button>
+
+                    <!-- CPU / NVMe Overheat -->
+                    <button onclick="injectChaos('overheat')" class="p-2.5 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-orange-500/50 rounded-xl text-left transition flex items-center gap-2.5 cursor-pointer group active:scale-98">
+                        <div class="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-400 group-hover:scale-110 transition shrink-0">
+                            <i data-lucide="thermometer" class="w-4 h-4"></i>
+                        </div>
+                        <div class="overflow-hidden">
+                            <div class="text-xs font-bold text-slate-200 truncate">அதிக வெப்பம் (85°C)</div>
+                            <div class="text-[10px] text-slate-400 truncate">Thermal throttle engaged</div>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- Self-Healing Watchdog Toggle & Notice -->
+                <div class="p-3 bg-slate-950/80 border border-slate-800 rounded-xl flex items-center justify-between text-xs font-mono-tech">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                        <span id="i18n-watchdog-label">தானியங்கி பழுதுநீக்கி (Watchdog):</span>
+                    </div>
+                    <button id="watchdog-toggle-btn" onclick="toggleWatchdog()" class="px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 cursor-pointer">
+                        ENABLED (10s)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right: Real-time Diagnostics Terminal (7 Cols) -->
+            <div class="lg:col-span-7 db-cabinet-shell rounded-2xl overflow-hidden flex flex-col h-[480px] border border-slate-800 shadow-2xl">
+                <!-- Terminal Header Bar -->
+                <div class="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between font-mono-tech">
+                    <div class="flex items-center gap-2">
+                        <div class="flex gap-1.5">
+                            <div class="w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+                            <div class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                        </div>
+                        <span class="text-xs text-slate-300 ml-1.5 flex items-center gap-1.5 font-bold">
+                            <i data-lucide="terminal" class="w-3.5 h-3.5 text-amber-400"></i>
+                            systemd-mcb-controller.log
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span id="log-count" class="text-[10px] text-slate-500">0 EVENTS</span>
+                        <button onclick="clearTerminal()" class="text-[10px] text-slate-400 hover:text-slate-200 transition underline cursor-pointer">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Log Stream Feed -->
+                <div id="terminal-logs" class="p-3.5 font-mono-tech text-[11px] overflow-y-auto space-y-1.5 flex-grow select-text bg-slate-950/90">
+                    <!-- Events will be appended live -->
+                </div>
+
+                <!-- Terminal Prompt Footer -->
+                <div class="bg-slate-900/90 px-3.5 py-2 border-t border-slate-800 font-mono-tech text-[11px] flex items-center justify-between text-slate-400">
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-emerald-400 font-bold">root@homelab-mcb:~#</span>
+                        <span class="text-slate-500 animate-pulse">_</span>
+                    </div>
+                    <span class="text-[10px] text-slate-500">IPC SOCKET ACTIVE ON /var/run/mcb.sock</span>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <div id="runbook-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
+        <div class="bg-slate-900 border-2 border-rose-500/60 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col shadow-2xl">
+            <!-- Modal Header -->
+            <div class="bg-slate-950 p-4 border-b border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-xl bg-rose-500/10 border border-rose-500/40 text-rose-400">
+                        <i data-lucide="book-open" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-bold text-white font-display">ஆஃப்லைன் அவசர கையேடு (OFFLINE EMERGENCY RUNBOOK)</h3>
+                        <p class="text-xs text-slate-400 font-mono-tech">இன்டர்நெட் மற்றும் AI இல்லாத போது சர்வரில் நேரடியாக காப்பி-பேஸ்ட் செய்ய வேண்டிய லினக்ஸ் கட்டளைகள்</p>
+                    </div>
+                </div>
+                <button onclick="closeRunbookModal()" class="p-2 text-slate-400 hover:text-white rounded-lg bg-slate-800 hover:bg-slate-700 cursor-pointer">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div class="p-5 overflow-y-auto space-y-6 text-xs font-mono-tech select-text bg-slate-950/70">
+                <!-- Section 1: Hard Drive Mount -->
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-amber-400 font-bold">
+                        <span>1. ஹார்ட் டிஸ்க் அன்மவுண்ட் ஆனால் சரிசெய்ய (Fix Unmounted Drive)</span>
+                        <button onclick="copyToClipboard('sudo blkid\nsudo mkdir -p /mnt/storage\nsudo mount -a\nsudo systemctl daemon-reload')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 cursor-pointer">Copy</button>
+                    </div>
+                    <pre class="bg-black/60 p-3 rounded-lg text-emerald-400 overflow-x-auto text-[11px]">
+# 1. டிஸ்க் UUID சரிபார்க்கவும்
+sudo blkid
+
+# 2. அனைத்து டிரைவ்களையும் மீண்டும் மவுண்ட் செய்யவும்
+sudo mount -a
+
+# 3. குறிப்பிட்ட டிரைவை மட்டும் மவுண்ட் செய்ய
+sudo mount /dev/sdb1 /mnt/storage
+
+# 4. பழுதடைந்த கோப்புகளை சரிசெய்ய (Filesystem check)
+sudo fsck -f /dev/sdb1</pre>
+                </div>
+
+                <!-- Section 2: 100% Disk Full Emergency -->
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-rose-400 font-bold">
+                        <span>2. சர்வர் மெமரி / ஸ்டோரேஜ் 100% நிறைந்தால் காலி செய்ய (100% Disk Full)</span>
+                        <button onclick="copyToClipboard('sudo journalctl --vacuum-time=2d\nsudo docker system prune -af --volumes\nsudo apt clean')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 cursor-pointer">Copy</button>
+                    </div>
+                    <pre class="bg-black/60 p-3 rounded-lg text-emerald-400 overflow-x-auto text-[11px]">
+# பழைய கணினி லாக் பைல்களை அழிக்க (Free up GBs immediately)
+sudo journalctl --vacuum-time=2d
+
+# தேவையில்லாத டாக்கர் கேச் மற்றும் கண்டெய்னர்களை அழிக்க
+sudo docker system prune -af --volumes
+
+# சிஸ்டம் பேக்கேஜ் கேச்சை அழிக்க
+sudo apt clean && sudo rm -rf /tmp/*</pre>
+                </div>
+
+                <!-- Section 3: Nginx 502 Bad Gateway -->
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-cyan-400 font-bold">
+                        <span>3. Nginx 502 / இணையதளங்கள் நிற்கும்போது (Nginx 502 Bad Gateway)</span>
+                        <button onclick="copyToClipboard('sudo nginx -t\nsudo systemctl restart nginx\nsudo journalctl -u nginx -n 30 --no-pager')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 cursor-pointer">Copy</button>
+                    </div>
+                    <pre class="bg-black/60 p-3 rounded-lg text-emerald-400 overflow-x-auto text-[11px]">
+# Nginx கான்ஃபிக் கோப்பில் பிழை உள்ளதா என பார்க்க
+sudo nginx -t
+
+# Nginx-ஐ ரீஸ்டார்ட் செய்ய
+sudo systemctl restart nginx
+
+# தவறை கண்டறிய லாக் பார்க்க
+sudo journalctl -u nginx -n 30 --no-pager</pre>
+                </div>
+
+                <!-- Section 4: Cloudflare Tunnel & Tailscale -->
+                <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 space-y-2">
+                    <div class="flex items-center justify-between text-purple-400 font-bold">
+                        <span>4. Cloudflare Tunnel & Tailscale ரீசெட் செய்ய (Tunnel & VPN Reset)</span>
+                        <button onclick="copyToClipboard('sudo systemctl restart cloudflared\nsudo tailscale up --reset\nsudo tailscale status')" class="px-2 py-1 rounded bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 cursor-pointer">Copy</button>
+                    </div>
+                    <pre class="bg-black/60 p-3 rounded-lg text-emerald-400 overflow-x-auto text-[11px]">
+# கிளவுட்ஃப்ளேர் டன்னலை ரீஸ்டார்ட் செய்ய
+sudo systemctl restart cloudflared
+
+# டெய்ல்ஸ்கேல் நெட்வொர்க்கை ரீசெட் செய்ய
+sudo tailscale up --reset
+sudo tailscale status</pre>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="bg-slate-950 p-3 border-t border-slate-800 flex justify-end">
+                <button onclick="closeRunbookModal()" class="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold cursor-pointer">
+                    மூடு (Close)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // -------------------------------------------------------------------------
+        // 1. DATA DICTIONARY & BILINGUAL TRANSLATIONS
+        // -------------------------------------------------------------------------
+        const I18N = {
+            ta: {
+                mainTitle: "ENTERPRISE SERVER MCB DISTRIBUTION BOARD",
+                mainSubtitle: "மின்னணு குறுக்கு-சுற்று பலகை • அனைத்து சேவைகள், இணையதளங்கள், ஹார்ட் டிரைவ்கள் & ஆஃப்லைன் தீர்வுகள்",
+                resetAll: "அனைத்தையும் இயக்கு (RESET ALL)",
+                runbookBtn: "ஆஃப்லைன் கையேடு (RUNBOOK)",
+                langBtn: "English Mode",
+                chaosHeading: "செயற்கை கோளாறு பரிசோதனை (CHAOS FAULT INJECTOR)",
+                chaosSubtext: "சர்வரில் நிஜமாக நடக்கும் கோளாறுகளை கிளிக் செய்து சோதிக்கவும். சுவிட்ச் உடனே ட்ரிப் ஆகி அலாரமிடும்:",
+                watchdogLabel: "தானியங்கி பழுதுநீக்கி (Watchdog):",
+                onlineLabel: "இயங்குகிறது",
+                trippedLabel: "ட்ரிப் ஆனது"
+            },
+            en: {
+                mainTitle: "ENTERPRISE SERVER MCB DISTRIBUTION BOARD",
+                mainSubtitle: "Heavy-Duty DIN-Rail Enclosure • 34 Dedicated Circuit Breakers for Portals, Storage & Resilient Self-Healing",
+                resetAll: "RESET ALL BREAKERS",
+                runbookBtn: "OFFLINE RUNBOOK",
+                langBtn: "தமிழ் வடிவம்",
+                chaosHeading: "CHAOS FAULT INJECTOR & DRILL STATION",
+                chaosSubtext: "Simulate true-to-life server failure modes to witness instant tripping and self-healing:",
+                watchdogLabel: "Self-Healing Watchdog:",
+                onlineLabel: "ONLINE",
+                trippedLabel: "TRIPPED"
+            }
+        };
+
+        let currentLang = 'ta';
+        let isAudioEnabled = true;
+        let isWatchdogActive = true;
+        let audioCtx = null;
+        let activeTierFilter = 'all';
+        let activeSearchQuery = '';
+
+        // -------------------------------------------------------------------------
+        // 2. COMPLETE 9 RAILS & 34 INDUSTRIAL BREAKERS
+        // -------------------------------------------------------------------------
+        const BOARD_TIERS = [
+            // Rail 1: Mains / Power
+            {
+                id: "tier-power",
+                titleEn: "Tier 1: Mains / Power & Motherboard",
+                titleTa: "பிரிவு 1: முதன்மை மின்சாரம் & மதர்போர்டு",
+                rating: "40A 2P / 240V AC",
+                icon: "zap",
+                breakers: [
+                    {
+                        id: "pwr-grid",
+                        nameEn: "AC Grid & UPS Inverter Feed",
+                        nameTa: "மின் விநியோகம் & UPS இன்வெர்ட்டர்",
+                        spec: "40A 2P",
+                        amps: 1.85,
+                        target: "apcupsd /dev/usb/hiddev0",
+                        state: true,
+                        restoreCmd: "systemctl restart apcupsd && upsc apc@localhost"
+                    },
+                    {
+                        id: "pwr-rails",
+                        nameEn: "PSU 12V/5V Rail Sensor",
+                        nameTa: "PSU 12V/5V மின்னழுத்த சென்சார்",
+                        spec: "20A 1P",
+                        amps: 0.95,
+                        target: "hwmon /sys/class/hwmon0",
+                        state: true,
+                        restoreCmd: "sensors-detect --auto && systemctl restart lm-sensors"
+                    },
+                    {
+                        id: "pwr-fans",
+                        nameEn: "Thermal & Fan Array Controller",
+                        nameTa: "வெப்பநிலை & கூலிங் ஃபேன் கட்டுப்பாடு",
+                        spec: "10A 1P",
+                        amps: 0.42,
+                        target: "pwmconfig / fancontrol.service",
+                        state: true,
+                        restoreCmd: "systemctl restart fancontrol"
+                    }
+                ]
+            },
+            // Rail 2: Storage & Filesystems
+            {
+                id: "tier-storage",
+                titleEn: "Tier 2: Storage & Filesystem Mounts",
+                titleTa: "பிரிவு 2: சேமிப்பகம் & ஹார்ட் டிஸ்க் பகிர்வுகள்",
+                rating: "25A 1P / EXT4 & ZFS",
+                icon: "hard-drive",
+                breakers: [
+                    {
+                        id: "stor-nvme",
+                        nameEn: "NVMe Root OS Drive (/)",
+                        nameTa: "முதன்மை NVMe OS ரூட் டிரைவ் (/)",
+                        spec: "C16 1P",
+                        amps: 0.65,
+                        target: "/dev/nvme0n1p2 [UUID=root]",
+                        state: true,
+                        restoreCmd: "mount -o remount,rw / && sync"
+                    },
+                    {
+                        id: "stor-hdd",
+                        nameEn: "Secondary HDD (/mnt/storage)",
+                        nameTa: "இரண்டாம் நிலை ஹார்ட் டிஸ்க் (/mnt/storage)",
+                        spec: "C16 1P",
+                        amps: 0.88,
+                        target: "/dev/sdb1 -> /mnt/storage",
+                        state: true,
+                        restoreCmd: "mount /dev/sdb1 /mnt/storage && hdparm -S 0 /dev/sdb"
+                    },
+                    {
+                        id: "stor-backup",
+                        nameEn: "Backup External Drive (/mnt/backup)",
+                        nameTa: "காப்புப் பிரதி ஹார்ட் டிரைவ் (/mnt/backup)",
+                        spec: "C10 1P",
+                        amps: 0.40,
+                        target: "/dev/sdc1 -> /mnt/backup",
+                        state: true,
+                        restoreCmd: "mount -a -t ext4 && rsync --dry-run /mnt/storage /mnt/backup"
+                    },
+                    {
+                        id: "stor-swap",
+                        nameEn: "ZRAM & Swap Allocator",
+                        nameTa: "ZRAM & விர்ச்சுவல் மெமரி ஸ்வாப்",
+                        spec: "B06 1P",
+                        amps: 0.15,
+                        target: "/swapfile (8GB Active)",
+                        state: true,
+                        restoreCmd: "swapon -a && zramctl --reset"
+                    }
+                ]
+            },
+            // Rail 3: Web Ingress & Reverse Proxy
+            {
+                id: "tier-web",
+                titleEn: "Tier 3: Web Ingress & Reverse Proxy",
+                titleTa: "பிரிவு 3: இணையதள கேட்வே & பிராக்ஸி",
+                rating: "16A 1P / HTTP-HTTPS",
+                icon: "globe",
+                breakers: [
+                    {
+                        id: "web-nginx",
+                        nameEn: "Nginx Reverse Proxy Engine",
+                        nameTa: "Nginx ரிவர்ஸ் பிராக்ஸி எஞ்சின்",
+                        spec: "C16 1P",
+                        amps: 0.75,
+                        target: "nginx.service :80/:443",
+                        state: true,
+                        restoreCmd: "nginx -t && systemctl restart nginx"
+                    },
+                    {
+                        id: "web-tunnel",
+                        nameEn: "Cloudflare Ingress Tunnel",
+                        nameTa: "கிளவுட்ஃப்ளேர் டன்னல் (cloudflared)",
+                        spec: "B10 1P",
+                        amps: 0.38,
+                        target: "cloudflared.service -> dash.domain",
+                        state: true,
+                        restoreCmd: "systemctl restart cloudflared"
+                    },
+                    {
+                        id: "web-certbot",
+                        nameEn: "Let's Encrypt SSL Certbot Daemon",
+                        nameTa: "SSL சான்றிதழ் தானியங்கி ரெனியூவல்",
+                        spec: "B06 1P",
+                        amps: 0.10,
+                        target: "certbot.timer (Automated Renew)",
+                        state: true,
+                        restoreCmd: "certbot renew --quiet"
+                    }
+                ]
+            },
+            // Rail 4: Network & Remote Access Mesh
+            {
+                id: "tier-net",
+                titleEn: "Tier 4: Network & Remote Access Mesh",
+                titleTa: "பிரிவு 4: நெட்வொர்க் & தொலைதூர அணுகல் (VPN)",
+                rating: "16A 1P / GIGABIT LAN",
+                icon: "wifi",
+                breakers: [
+                    {
+                        id: "net-tailscale",
+                        nameEn: "Tailscale Secure Mesh VPN",
+                        nameTa: "டெய்ல்ஸ்கேல் பாதுகாப்பான VPN மெஷ்",
+                        spec: "B06 1P",
+                        amps: 0.22,
+                        target: "tailscaled.service (100.92.14.88)",
+                        state: true,
+                        restoreCmd: "tailscale up --reset && systemctl restart tailscaled"
+                    },
+                    {
+                        id: "net-lan",
+                        nameEn: "Local Gigabit LAN Interface (enp3s0)",
+                        nameTa: "உள்ளூர் லேன் கேட்வே (Gigabit Ethernet)",
+                        spec: "B10 1P",
+                        amps: 0.30,
+                        target: "enp3s0 (192.168.1.100/24)",
+                        state: true,
+                        restoreCmd: "ip link set enp3s0 up && systemctl restart networking"
+                    },
+                    {
+                        id: "net-ssh",
+                        nameEn: "SSH Remote Terminal (Port 22)",
+                        nameTa: "SSH டெர்மினல் அணுகல் (Port 22)",
+                        spec: "B06 1P",
+                        amps: 0.12,
+                        target: "sshd.service :22",
+                        state: true,
+                        restoreCmd: "systemctl restart sshd"
+                    }
+                ]
+            },
+            // Rail 5: Databases & Automation
+            {
+                id: "tier-db",
+                titleEn: "Tier 5: Databases & Automation Engine",
+                titleTa: "பிரிவு 5: தரவுத்தளங்கள் & ஆட்டோமேஷன்",
+                rating: "20A 1P / PERSISTENCE",
+                icon: "database",
+                breakers: [
+                    {
+                        id: "db-postgres",
+                        nameEn: "PostgreSQL / Supabase Local DB",
+                        nameTa: "போஸ்ட்கிரெஸ் / சுபாபேஸ் லோக்கல் டேட்டாபேஸ்",
+                        spec: "C16 1P",
+                        amps: 0.95,
+                        target: "postgresql.service :5432",
+                        state: true,
+                        restoreCmd: "systemctl restart postgresql"
+                    },
+                    {
+                        id: "db-redis",
+                        nameEn: "Redis In-Memory Key Cache",
+                        nameTa: "ரெடிஸ் அதிவேக மெமரி கேச்",
+                        spec: "B10 1P",
+                        amps: 0.28,
+                        target: "redis-server.service :6379",
+                        state: true,
+                        restoreCmd: "systemctl restart redis-server"
+                    },
+                    {
+                        id: "db-n8n",
+                        nameEn: "n8n Workflow Automation Engine",
+                        nameTa: "n8n பணிப்பாய்வு ஆட்டோமேஷன் எஞ்சின்",
+                        spec: "B10 1P",
+                        amps: 0.45,
+                        target: "docker compose: n8n-automation",
+                        state: true,
+                        restoreCmd: "docker restart n8n_worker"
+                    }
+                ]
+            },
+            // Rail 6: Client Web Apps & Portals
+            {
+                id: "tier-portals",
+                titleEn: "Tier 6: Client Web Apps & Live Portals",
+                titleTa: "பிரிவு 6: நேரடி இணையதளங்கள் & பயன்பாடுகள் (Live Sites)",
+                rating: "25A 1P / DOCKER & PM2",
+                icon: "layout-grid",
+                breakers: [
+                    {
+                        id: "app-waffle",
+                        nameEn: "Srees Waffle Galaxy Official Portal",
+                        nameTa: "ஸ்ரீஸ் வாஃபிள் கேலக்ஸி தளம்",
+                        spec: "C10 1P",
+                        amps: 0.35,
+                        target: "pm2: srees-waffle-galaxy:3001",
+                        state: true,
+                        restoreCmd: "pm2 restart srees-waffle-galaxy"
+                    },
+                    {
+                        id: "app-siddhan",
+                        nameEn: "Sri Siddhan Essential B2B Wholesale",
+                        nameTa: "ஸ்ரீ சித்தன் எசன்ஷியல் மொத்த விற்பனை தளம்",
+                        spec: "C10 1P",
+                        amps: 0.38,
+                        target: "pm2: siddhan-essential:3002",
+                        state: true,
+                        restoreCmd: "pm2 restart siddhan-essential"
+                    },
+                    {
+                        id: "app-gega",
+                        nameEn: "Gega Byte Bazaar Digital Store",
+                        nameTa: "கிகா பைட் பஜார் டிஜிட்டல் ஸ்டோர்",
+                        spec: "C10 1P",
+                        amps: 0.42,
+                        target: "docker: gegabyte-store:3003",
+                        state: true,
+                        restoreCmd: "docker restart gegabyte-store"
+                    },
+                    {
+                        id: "app-megas",
+                        nameEn: "Megas Makeover Beauty Studio App",
+                        nameTa: "மேகாஸ் மேக்ஓவர் பியூட்டி ஸ்டுடியோ தளம்",
+                        spec: "C10 1P",
+                        amps: 0.25,
+                        target: "pm2: megas-makeover:3004",
+                        state: true,
+                        restoreCmd: "pm2 restart megas-makeover"
+                    },
+                    {
+                        id: "app-skcrackers",
+                        nameEn: "SK Crackers Seasonal Festival Portal",
+                        nameTa: "SK கிராக்கர்ஸ் பண்டிகை ஆன்லைன் போர்டல்",
+                        spec: "C10 1P",
+                        amps: 0.32,
+                        target: "pm2: sk-crackers:3005",
+                        state: true,
+                        restoreCmd: "pm2 restart sk-crackers"
+                    },
+                    {
+                        id: "app-roi",
+                        nameEn: "Franchise ROI Calculator App",
+                        nameTa: "ஃபிரான்சைஸ் ROI லாபக் கணக்கீட்டு செயலி",
+                        spec: "B06 1P",
+                        amps: 0.18,
+                        target: "docker: franchise-roi-app:3006",
+                        state: true,
+                        restoreCmd: "docker restart franchise-roi-app"
+                    }
+                ]
+            },
+            // Rail 7: Hardware & Thermal Sentinel (NEW)
+            {
+                id: "tier-hardware",
+                titleEn: "Tier 7: Thermal & Hardware Health Sentinel",
+                titleTa: "பிரிவு 7: வன்பொருள் வெப்பநிலை & ஆரோக்கியப் பாதுகாப்பு",
+                rating: "16A 1P / SENSORS & THROTTLE",
+                icon: "cpu",
+                breakers: [
+                    {
+                        id: "hw-throttle",
+                        nameEn: "CPU Thermal Throttle Limiter",
+                        nameTa: "CPU வெப்ப நிலை தணிப்பான் (Throttle Guard)",
+                        spec: "B10 1P",
+                        amps: 0.25,
+                        target: "intel_pstate / cpufreq-set",
+                        state: true,
+                        restoreCmd: "cpufreq-set -g powersave && systemctl restart thermald"
+                    },
+                    {
+                        id: "hw-nvme-temp",
+                        nameEn: "NVMe Overheat Safe Shield",
+                        nameTa: "NVMe சூடாதல் தடுப்புப் பாதுகாப்பு",
+                        spec: "B06 1P",
+                        amps: 0.20,
+                        target: "nvme-cli smart-log /dev/nvme0",
+                        state: true,
+                        restoreCmd: "nvme set-feature /dev/nvme0 -f 0x0c -v 0x00"
+                    },
+                    {
+                        id: "hw-smart",
+                        nameEn: "SMART Bad Sector Watcher",
+                        nameTa: "SMART பேட்-செக்டார் கண்காணிப்பாளர்",
+                        spec: "B06 1P",
+                        amps: 0.15,
+                        target: "smartd.service (/dev/sdb)",
+                        state: true,
+                        restoreCmd: "smartctl -t short /dev/sdb && systemctl restart smartd"
+                    },
+                    {
+                        id: "hw-ram",
+                        nameEn: "ECC & RAM OOM Guard Barrier",
+                        nameTa: "RAM மற்றும் OOM கில்லர் பாதுகாப்பு",
+                        spec: "B10 1P",
+                        amps: 0.30,
+                        target: "earlyoom.service / sysctl vm",
+                        state: true,
+                        restoreCmd: "echo 3 > /proc/sys/vm/drop_caches && systemctl restart earlyoom"
+                    }
+                ]
+            },
+            // Rail 8: Security, Firewall & Intrusion Shield (NEW)
+            {
+                id: "tier-sec",
+                titleEn: "Tier 8: Security & Intrusion Shield",
+                titleTa: "பிரிவு 8: ஃபயர்வால் & பாதுகாப்பு அரண்",
+                rating: "20A 1P / PACKET FILTER",
+                icon: "shield-alert",
+                breakers: [
+                    {
+                        id: "sec-fail2ban",
+                        nameEn: "Fail2ban SSH Brute-Force Barrier",
+                        nameTa: "Fail2ban பாஸ்வேர்ட் தாக்குதல் தடுப்பு",
+                        spec: "B10 1P",
+                        amps: 0.22,
+                        target: "fail2ban.service (jail: sshd)",
+                        state: true,
+                        restoreCmd: "fail2ban-client unban --all && systemctl restart fail2ban"
+                    },
+                    {
+                        id: "sec-ufw",
+                        nameEn: "UFW Linux Firewall Rule Engine",
+                        nameTa: "UFW லினக்ஸ் ஃபயர்வால் விதிமுறை",
+                        spec: "B16 1P",
+                        amps: 0.18,
+                        target: "ufw.service (iptables stateful)",
+                        state: true,
+                        restoreCmd: "ufw reload && iptables -F DOCKER-USER"
+                    },
+                    {
+                        id: "sec-ratelimit",
+                        nameEn: "Nginx DDoS & Burst Rate-Limiter",
+                        nameTa: "DDoS & ரேட் லிமிட் பாதுகாப்பு",
+                        spec: "B10 1P",
+                        amps: 0.35,
+                        target: "limit_req_zone binary_remote_addr",
+                        state: true,
+                        restoreCmd: "nginx -s reload"
+                    },
+                    {
+                        id: "sec-portshield",
+                        nameEn: "Port Scan & SYN Flood Deflector",
+                        nameTa: "போர்ட் ஸ்கேன் & SYN ஃப்ளட் தடுப்பான்",
+                        spec: "B06 1P",
+                        amps: 0.12,
+                        target: "sysctl net.ipv4.tcp_syncookies=1",
+                        state: true,
+                        restoreCmd: "sysctl -p /etc/sysctl.conf"
+                    }
+                ]
+            },
+            // Rail 9: Backup & Disaster Recovery (NEW)
+            {
+                id: "tier-backup",
+                titleEn: "Tier 9: Backup & Disaster Recovery Loop",
+                titleTa: "பிரிவு 9: காப்புப் பிரதி & பேரிடர் மீட்பு சுழற்சி",
+                rating: "16A 1P / RPO-RTO PIPELINE",
+                icon: "layers",
+                breakers: [
+                    {
+                        id: "bk-rsync",
+                        nameEn: "Nightly Local Rsync Snapshot",
+                        nameTa: "இரவு நேர லோக்கல் Rsync ஸ்னாப்ஷாட்",
+                        spec: "B10 1P",
+                        amps: 0.45,
+                        target: "rsync.service -> /mnt/backup/daily",
+                        state: true,
+                        restoreCmd: "systemctl start rsync-snapshot.service"
+                    },
+                    {
+                        id: "bk-s3",
+                        nameEn: "Offsite Encrypted Cloud Sync (Rclone)",
+                        nameTa: "கிளவுட் ஆஃப்-சைட் ரகசிய ஒத்திசைவு (Rclone)",
+                        spec: "B10 1P",
+                        amps: 0.38,
+                        target: "rclone.service -> Backblaze-B2",
+                        state: true,
+                        restoreCmd: "systemctl restart rclone-sync"
+                    },
+                    {
+                        id: "bk-pgdump",
+                        nameEn: "Automated Postgres Dump to Tar",
+                        nameTa: "தானியங்கி Postgres டேட்டாபேஸ் டம்ப்",
+                        spec: "B06 1P",
+                        amps: 0.28,
+                        target: "pg_dumpall | gzip > /mnt/storage/db.sql.gz",
+                        state: true,
+                        restoreCmd: "bash /opt/scripts/backup-db.sh"
+                    },
+                    {
+                        id: "bk-powerloss",
+                        nameEn: "Dirty Power-Loss Recovery Daemon",
+                        nameTa: "திடீர் மின்தடை தானியங்கி மீட்பு ஏஜென்ட்",
+                        spec: "B16 1P",
+                        amps: 0.20,
+                        target: "fsck-auto-recover.service",
+                        state: true,
+                        restoreCmd: "systemctl restart fsck-recover"
+                    }
+                ]
+            }
+        ];
+
+       // -------------------------------------------------------------------------
+        // 3. MECHANICAL MCB AUDIO SYNTHESIZER (HEAVY INDUSTRIAL THUD & SNAP)
+        // -------------------------------------------------------------------------
+        function playSwitchClick(type = 'on') {
+            if (!isAudioEnabled) return;
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'trip') {
+                    // 1. கனமான டமார் பேஸ் அதிரடி (Heavy Mechanical Drop Thud)
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(160, now);
+                    osc.frequency.exponentialRampToValueAtTime(25, now + 0.16);
+
+                    gain.gain.setValueAtTime(1.0, now); // அதிகபட்ச முழு சத்தம்
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.16);
+
+                    // 2. ஸ்பிரிங் ரிலீஸ் மெட்டாலிக் ஸ்னாப் (Sharp Spring Crack)
+                    const bufLen = Math.floor(audioCtx.sampleRate * 0.08);
+                    const noiseBuf = audioCtx.createBuffer(1, bufLen, audioCtx.sampleRate);
+                    const out = noiseBuf.getChannelData(0);
+                    for (let i = 0; i < bufLen; i++) {
+                        out[i] = Math.random() * 2 - 1;
+                    }
+                    const noise = audioCtx.createBufferSource();
+                    noise.buffer = noiseBuf;
+
+                    const filter = audioCtx.createBiquadFilter();
+                    filter.type = 'bandpass';
+                    filter.frequency.value = 1300;
+
+                    const noiseGain = audioCtx.createGain();
+                    noiseGain.gain.setValueAtTime(0.9, now);
+                    noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+
+                    noise.connect(filter);
+                    filter.connect(noiseGain);
+                    noiseGain.connect(audioCtx.destination);
+                    noise.start(now);
+
+                } else {
+                    // கனமான லிவர் லேட்ச் ஆன் 'டக்' சவுண்ட் (Sharp Heavy Latch ON)
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(360, now);
+                    osc.frequency.exponentialRampToValueAtTime(65, now + 0.09);
+
+                    gain.gain.setValueAtTime(0.95, now); // முழு சத்தம்
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.09);
+                }
+            } catch (e) {
+                // Audio suppression handling
+            }
+        }
+
+        function toggleAudio() {
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('sound-btn');
+            const icon = document.getElementById('sound-icon');
+            const label = document.getElementById('sound-label');
+
+            if (isAudioEnabled) {
+                icon.className = "w-4 h-4 text-emerald-400";
+                label.innerText = "AUDIO ON";
+                btn.className = "px-3 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 cursor-pointer text-slate-300";
+            } else {
+                icon.className = "w-4 h-4 text-slate-500";
+                label.innerText = "MUTED";
+                btn.className = "px-3 py-2 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95 cursor-pointer text-slate-500";
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // 4. BOARD RENDERING & FILTER ENGINE
+        // -------------------------------------------------------------------------
+        function filterBreakers() {
+            activeSearchQuery = document.getElementById('search-input').value.toLowerCase().trim();
+            renderBoard();
+        }
+
+        function filterByTier(tierId) {
+            activeTierFilter = tierId;
+            document.querySelectorAll('.tier-filter-btn').forEach(btn => {
+                if (btn.getAttribute('data-tier') === tierId) {
+                    btn.className = "px-2.5 py-1 rounded bg-slate-800 text-amber-400 border border-amber-500/50 cursor-pointer font-bold tier-filter-btn";
+                } else {
+                    btn.className = "px-2.5 py-1 rounded bg-slate-900 text-slate-400 hover:bg-slate-800 cursor-pointer tier-filter-btn";
+                }
+            });
+            renderBoard();
+        }
+
+        function renderBoard() {
+            const container = document.getElementById('rails-container');
+            container.innerHTML = '';
+
+            BOARD_TIERS.forEach((tier) => {
+                // Tier filter match
+                if (activeTierFilter !== 'all' && tier.id !== activeTierFilter) {
+                    return;
+                }
+
+                // Filter items by search text
+                const filteredBreakers = tier.breakers.filter(b => {
+                    if (!activeSearchQuery) return true;
+                    return (
+                        b.nameEn.toLowerCase().includes(activeSearchQuery) ||
+                        b.nameTa.toLowerCase().includes(activeSearchQuery) ||
+                        b.target.toLowerCase().includes(activeSearchQuery) ||
+                        b.id.toLowerCase().includes(activeSearchQuery)
+                    );
+                });
+
+                if (filteredBreakers.length === 0) return;
+
+                const tierDiv = document.createElement('div');
+                tierDiv.className = "bg-slate-950/70 border border-slate-800 rounded-xl p-3 sm:p-4 relative shadow-inner";
+
+                const allActive = tier.breakers.every(b => b.state);
+                const title = currentLang === 'ta' ? tier.titleTa : tier.titleEn;
+
+                tierDiv.innerHTML = `
+                    <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 mb-3 border-b border-slate-800/80">
+                        <div class="flex items-center gap-2">
+                            <div class="p-1.5 rounded-lg bg-slate-900 text-amber-400 border border-slate-800">
+                                <i data-lucide="${tier.icon}" class="w-4 h-4"></i>
+                            </div>
+                            <div>
+                                <span class="font-display font-bold text-xs sm:text-sm text-slate-200 tracking-wide">${title}</span>
+                                <span class="ml-2 text-[10px] font-mono-tech px-2 py-0.5 rounded bg-slate-900 text-slate-400 border border-slate-800">${tier.rating}</span>
+                            </div>
+                        </div>
+
+                        <!-- Tier Master Toggle Switch -->
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-mono-tech text-slate-500 hidden sm:inline">RAIL ISOLATOR:</span>
+                            <button onclick="toggleTierMaster('${tier.id}')" class="px-2.5 py-1 rounded bg-slate-900 hover:bg-slate-800 border border-slate-700 text-[10px] font-mono-tech font-bold text-amber-400 flex items-center gap-1 cursor-pointer transition">
+                                <span class="w-2 h-2 rounded-full ${allActive ? 'bg-emerald-400' : 'bg-rose-500'}"></span>
+                                ${allActive ? 'TRIP RAIL' : 'RESET RAIL'}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- DIN Rail Steel Bar Graphic -->
+                    <div class="din-steel-rail rounded-sm mb-4 relative flex items-center justify-around px-4">
+                        <div class="w-6 h-1 bg-slate-300/40 rounded-sm"></div>
+                        <div class="w-6 h-1 bg-slate-300/40 rounded-sm"></div>
+                        <div class="w-6 h-1 bg-slate-300/40 rounded-sm"></div>
+                        <div class="w-6 h-1 bg-slate-300/40 rounded-sm"></div>
+                        <div class="w-6 h-1 bg-slate-300/40 rounded-sm"></div>
+                    </div>
+
+                    <!-- Modular MCB Units Grid -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2.5 sm:gap-3" id="grid-${tier.id}">
+                    </div>
+                `;
+
+                container.appendChild(tierDiv);
+
+                const grid = document.getElementById(`grid-${tier.id}`);
+                filteredBreakers.forEach((b) => {
+                    const mcbEl = document.createElement('div');
+                    mcbEl.className = `compact-mcb-casing rounded-xl p-2.5 flex flex-col justify-between ${b.state ? '' : 'tripped-glow'}`;
+                    mcbEl.id = `card-${b.id}`;
+
+                    const bName = currentLang === 'ta' ? b.nameTa : b.nameEn;
+                    const statusText = b.state 
+                        ? (currentLang === 'ta' ? I18N.ta.onlineLabel : I18N.en.onlineLabel)
+                        : (currentLang === 'ta' ? I18N.ta.trippedLabel : I18N.en.trippedLabel);
+
+                    mcbEl.innerHTML = `
+                        <!-- Top Rating Spec & LED -->
+                        <div class="flex items-center justify-between gap-1 mb-1.5">
+                            <span class="text-[9px] font-mono-tech font-bold text-slate-400 uppercase tracking-tighter bg-slate-900/90 px-1 py-0.5 rounded border border-slate-800">
+                                ${b.spec}
+                            </span>
+                            <div id="led-${b.id}" class="w-2.5 h-2.5 rounded-full ${b.state ? 'led-lamp-live' : 'led-lamp-trip'}"></div>
+                        </div>
+
+                        <!-- MCB Label -->
+                        <div class="my-0.5 text-center">
+                            <div class="text-[11px] font-bold text-slate-100 line-clamp-1 leading-tight font-display" title="${bName}">
+                                ${bName}
+                            </div>
+                            <div class="text-[9px] text-slate-500 font-mono-tech truncate mt-0.5" title="${b.target}">
+                                ${b.target}
+                            </div>
+                        </div>
+
+                        <!-- 3D Rocker Lever Switch -->
+                        <div class="my-2.5 flex flex-col items-center">
+                            <div class="w-10 h-16 mcb-rocker-slot rounded-md p-1 flex flex-col justify-between items-center relative border border-slate-800">
+                                <span class="text-[7px] font-mono-tech font-bold text-slate-600 z-10">ON</span>
+                                
+                                <button id="lever-${b.id}" onclick="toggleSingleBreaker('${tier.id}', '${b.id}')" class="w-7 h-7 rounded flex items-center justify-center cursor-pointer mcb-tactile-switch z-20 ${b.state ? 'lever-state-on' : 'lever-state-off'}" title="Toggle Breaker">
+                                    <div class="w-3.5 h-1 bg-white/70 rounded-full"></div>
+                                </button>
+
+                                <span class="text-[7px] font-mono-tech font-bold text-slate-600 z-10">OFF</span>
+                            </div>
+
+                            <!-- Small Status Badge -->
+                            <div class="mt-2 text-center w-full">
+                                <span id="badge-${b.id}" class="text-[9px] font-mono-tech font-bold uppercase px-1.5 py-0.5 rounded block truncate ${
+                                    b.state 
+                                        ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                                        : 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
+                                }">
+                                    ${statusText}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Current Draw & 1-Click Heal button -->
+                        <div class="pt-1.5 border-t border-slate-800/80 text-[9px] font-mono-tech flex items-center justify-between text-slate-400">
+                            <span id="amp-${b.id}">${b.state ? `${b.amps}A` : '0.00A'}</span>
+                            <div class="flex items-center gap-1.5">
+                                ${!b.state ? `
+                                    <button onclick="selfHealBreaker('${tier.id}', '${b.id}')" class="text-emerald-400 hover:text-emerald-300 font-bold underline cursor-pointer" title="Run autonomous Linux self-heal">
+                                        HEAL
+                                    </button>
+                                ` : ''}
+                                <button onclick="toggleSingleBreaker('${tier.id}', '${b.id}')" class="hover:text-amber-400 underline cursor-pointer">
+                                    ${b.state ? (currentLang === 'ta' ? 'துண்டி' : 'Trip') : (currentLang === 'ta' ? 'இயக்கு' : 'Reset')}
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    grid.appendChild(mcbEl);
+                });
+            });
+
+            lucide.createIcons();
+            updateLiveStats();
+        }
+
+        // -------------------------------------------------------------------------
+        // 5. INTERACTIVE BREAKER TOGGLE & AUTONOMOUS 1-CLICK HEALER
+        // -------------------------------------------------------------------------
+        function toggleSingleBreaker(tierId, breakerId) {
+            const tier = BOARD_TIERS.find(t => t.id === tierId);
+            if (!tier) return;
+            const b = tier.breakers.find(item => item.id === breakerId);
+            if (!b) return;
+
+            b.state = !b.state;
+            playSwitchClick(b.state ? 'on' : 'trip');
+
+            const bName = currentLang === 'ta' ? b.nameTa : b.nameEn;
+            if (b.state) {
+                logMessage("MCB-RESET", `சுவிட்ச் இயக்கப்பட்டது (UP): [${bName}]. கட்டளை: ${b.restoreCmd}`, "emerald");
+            } else {
+                logMessage("MCB-TRIP", `சுவிட்ச் துண்டிக்கப்பட்டது (DOWN): [${bName}] பாதுகாப்பாக நிறுத்தப்பட்டது.`, "rose");
+            }
+
+            renderBoard();
+        }
+
+        function selfHealBreaker(tierId, breakerId) {
+            const tier = BOARD_TIERS.find(t => t.id === tierId);
+            if (!tier) return;
+            const b = tier.breakers.find(item => item.id === breakerId);
+            if (!b) return;
+
+            const bName = currentLang === 'ta' ? b.nameTa : b.nameEn;
+            logMessage("SELF-HEAL", `தானியங்கி மீட்பு துவங்கியது: [${bName}] -> ${b.restoreCmd}`, "cyan");
+
+            setTimeout(() => {
+                b.state = true;
+                playSwitchClick('on');
+                logMessage("RESTORED", `வெற்றிகரமாக சரிசெய்யப்பட்டது: [${bName}] சுவிட்ச் மேலே ஏறியது!`, "emerald");
+                renderBoard();
+            }, 600);
+        }
+
+        function toggleTierMaster(tierId) {
+            const tier = BOARD_TIERS.find(t => t.id === tierId);
+            if (!tier) return;
+
+            const allActive = tier.breakers.every(b => b.state);
+            const newState = !allActive;
+
+            tier.breakers.forEach(b => {
+                b.state = newState;
+            });
+
+            playSwitchClick(newState ? 'on' : 'trip');
+
+            const tierName = currentLang === 'ta' ? tier.titleTa : tier.titleEn;
+            if (newState) {
+                logMessage("RAIL-RESET", `முழு பிரிவு சுவிட்சுகள் இயக்கப்பட்டன: [${tierName}]`, "emerald");
+            } else {
+                logMessage("RAIL-TRIP", `முழு பிரிவு சுவிட்சுகள் ட்ரிப் செய்யப்பட்டன: [${tierName}]`, "amber");
+            }
+
+            renderBoard();
+        }
+
+        function resetEveryBreaker() {
+            BOARD_TIERS.forEach(tier => {
+                tier.breakers.forEach(b => {
+                    b.state = true;
+                });
+            });
+
+            playSwitchClick('on');
+            logMessage("MASTER-RESET", `அனைத்து 34 MCB சுவிட்சுகளும் வெற்றிகரமாக மீட்டமைக்கப்பட்டன.`, "emerald");
+            renderBoard();
+        }
+
+        // -------------------------------------------------------------------------
+        // 6. EXPANDED CHAOS INJECTION ENGINE
+        // -------------------------------------------------------------------------
+        function injectChaos(type) {
+            playSwitchClick('trip');
+
+            if (type === 'power') {
+                logMessage("GRID-DROP", "எச்சரிக்கை! பிரதான ஏசி மின்சாரத்தில் மின்னழுத்தம் 165V-க்கு கீழ் குறைந்தது! UPS மற்றும் பவர் பிரேக்கர் ட்ரிப் ஆனது.", "rose");
+                const pwrTier = BOARD_TIERS.find(t => t.id === 'tier-power');
+                pwrTier.breakers.forEach(b => { b.state = false; });
+            } else if (type === 'hdd') {
+                logMessage("SATA-FAIL", "KERNEL [sd 1:0:0:0]: I/O Error on sector 1048576! /mnt/storage அன்மவுண்ட் ஆகி சுவிட்ச் தானாக கீழே விழுந்தது.", "rose");
+                const storTier = BOARD_TIERS.find(t => t.id === 'tier-storage');
+                const hdd = storTier.breakers.find(b => b.id === 'stor-hdd');
+                if (hdd) hdd.state = false;
+            } else if (type === 'disk-full') {
+                logMessage("DISK-100%", "CRITICAL: Root filesystem (/) is 100% full! No space left on device. Logging locked.", "rose");
+                const storTier = BOARD_TIERS.find(t => t.id === 'tier-storage');
+                const rootDrive = storTier.breakers.find(b => b.id === 'stor-nvme');
+                if (rootDrive) rootDrive.state = false;
+            } else if (type === 'web') {
+                logMessage("NGINX-CRASH", "ERR: Nginx worker socket exhausted! 10 இணையதளங்களும் 502 Gateway பிழையைக் காட்டுகின்றன.", "rose");
+                const webTier = BOARD_TIERS.find(t => t.id === 'tier-web');
+                const nginx = webTier.breakers.find(b => b.id === 'web-nginx');
+                if (nginx) nginx.state = false;
+
+                const portTier = BOARD_TIERS.find(t => t.id === 'tier-portals');
+                portTier.breakers.forEach(b => { b.state = false; });
+            } else if (type === 'tunnel') {
+                logMessage("CF-TIMEOUT", "TUNNEL: cloudflared quic connection terminated. dash.domain.in முடங்கியது.", "amber");
+                const webTier = BOARD_TIERS.find(t => t.id === 'tier-web');
+                const tunnel = webTier.breakers.find(b => b.id === 'web-tunnel');
+                if (tunnel) tunnel.state = false;
+            } else if (type === 'oom') {
+                logMessage("OOM-KILL", "KERNEL: Out of memory: Killed process (postgres / n8n-worker). Swapping exhausted.", "rose");
+                const dbTier = BOARD_TIERS.find(t => t.id === 'tier-db');
+                dbTier.breakers.forEach(b => { b.state = false; });
+                const hwTier = BOARD_TIERS.find(t => t.id === 'tier-hardware');
+                const ramGuard = hwTier.breakers.find(b => b.id === 'hw-ram');
+                if (ramGuard) ramGuard.state = false;
+            } else if (type === 'ssh-brute') {
+                logMessage("FAIL2BAN-TRIP", "SECURITY: Over 120 unauthorized SSH attempts detected from subnet 185.220.x.x. Port 22 locked.", "rose");
+                const secTier = BOARD_TIERS.find(t => t.id === 'tier-sec');
+                const f2b = secTier.breakers.find(b => b.id === 'sec-fail2ban');
+                if (f2b) f2b.state = false;
+            } else if (type === 'overheat') {
+                logMessage("THERMAL-ALARM", "OVERHEAT ALERT: CPU core reached 85°C! Limiting clock frequencies to 1.4GHz.", "amber");
+                const hwTier = BOARD_TIERS.find(t => t.id === 'tier-hardware');
+                const throttle = hwTier.breakers.find(b => b.id === 'hw-throttle');
+                if (throttle) throttle.state = false;
+            }
+
+            renderBoard();
+        }
+
+        // -------------------------------------------------------------------------
+        // 7. BACKGROUND WATCHDOG AUTONOMOUS RESTORER
+        // -------------------------------------------------------------------------
+        function toggleWatchdog() {
+            isWatchdogActive = !isWatchdogActive;
+            const btn = document.getElementById('watchdog-toggle-btn');
+            if (isWatchdogActive) {
+                btn.className = "px-2.5 py-1 rounded-md text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 cursor-pointer";
+                btn.innerText = "ENABLED (10s)";
+                logMessage("WATCHDOG", "சுய-சீரமைப்பு ஆட்டோ-ஹீலிங் வாட்ச்டாக் இயக்கப்பட்டது.", "cyan");
+            } else {
+                btn.className = "px-2.5 py-1 rounded-md text-[10px] font-bold bg-slate-800 text-slate-500 border border-slate-700 cursor-pointer";
+                btn.innerText = "DISABLED";
+                logMessage("WATCHDOG", "சுய-சீரமைப்பு வாட்ச்டாக் தற்காலிகமாக நிறுத்தப்பட்டது.", "slate");
+            }
+        }
+
+function updateBoardWithServer(data) {
+    const setBreaker = (tId, bId, isUp) => {
+        const tier = BOARD_TIERS.find(t => t.id === tId);
+        if (!tier) return;
+        const b = tier.breakers.find(item => item.id === bId);
+        if (!b) return;
+        if (b.state !== isUp) {
+            b.state = isUp;
+            playSwitchClick(isUp ? 'on' : 'trip');
+        }
+    };
+
+    // 1. Nginx சர்வீஸ் நிலை
+    const nginxUp = !!(data.services && data.services.nginx);
+    setBreaker('tier-web', 'web-nginx', nginxUp);
+
+    // 2. Storage & Backup டிரைவ்கள்
+    if (data.mounts) {
+        setBreaker('tier-storage', 'stor-hdd', !!data.mounts.storage);
+        setBreaker('tier-storage', 'stor-backup', !!data.mounts.backup);
+    }
+
+    // 3. உங்களின் 6 தளங்கள் (Nginx முடங்கினால் தானாக ட்ரிப் ஆகும்)
+    const portalIds = [
+        'app-waffle', 
+        'app-siddhan', 
+        'app-gega', 
+        'app-megas', 
+        'app-skcrackers', 
+        'app-roi'
+    ];
+    portalIds.forEach(id => {
+        setBreaker('tier-portals', id, nginxUp);
+    });
+
+    renderBoard();
+}
+
+async function syncWithServer() {
+    try {
+        const res = await fetch('https://breaker.corepulse.in/api/status', {
+            headers: { 'Authorization': 'Bearer Aathava@7373k' }
+        });
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        const data = await res.json();
+        updateBoardWithServer(data);
+    } catch (err) {
+        console.error("சர்வர் தொடர்பு பிழை:", err);
+    }
+}
+
+// 3 வினாடிக்கு ஒருமுறை சர்வரோடு தொடர்ச்சியாக ஒத்திசைக்க
+setInterval(syncWithServer, 3000);
+syncWithServer();
+
+        // -------------------------------------------------------------------------
+        // 8. LOGGING & METRICS
+        // -------------------------------------------------------------------------
+        let totalLogsCount = 0;
+        function logMessage(source, message, color = 'slate') {
+            totalLogsCount++;
+            const stream = document.getElementById('terminal-logs');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-GB', { hour12: false });
+
+            let textColor = 'text-slate-300';
+            let badgeBg = 'bg-slate-900 text-slate-400 border border-slate-800';
+
+            if (color === 'rose') {
+                textColor = 'text-rose-400 font-semibold';
+                badgeBg = 'bg-rose-950/80 text-rose-300 border border-rose-800';
+            } else if (color === 'emerald') {
+                textColor = 'text-emerald-300';
+                badgeBg = 'bg-emerald-950/80 text-emerald-300 border border-emerald-800';
+            } else if (color === 'amber') {
+                textColor = 'text-amber-300';
+                badgeBg = 'bg-amber-950/80 text-amber-300 border border-amber-800';
+            } else if (color === 'cyan') {
+                textColor = 'text-cyan-300';
+                badgeBg = 'bg-cyan-950/80 text-cyan-300 border border-cyan-800';
+            }
+
+            const line = document.createElement('div');
+            line.className = 'flex items-start gap-1.5 leading-snug';
+            line.innerHTML = `
+                <span class="text-[9px] text-slate-500 shrink-0 font-mono-tech">[${timeStr}]</span>
+                <span class="text-[8px] px-1 py-0.2 rounded font-bold shrink-0 font-mono-tech uppercase ${badgeBg}">${source}</span>
+                <span class="${textColor} font-mono-tech break-all">${message}</span>
+            `;
+
+            stream.appendChild(line);
+            stream.scrollTop = stream.scrollHeight;
+            document.getElementById('log-count').innerText = `${totalLogsCount} EVENTS`;
+        }
+
+        function clearTerminal() {
+            document.getElementById('terminal-logs').innerHTML = '';
+            totalLogsCount = 0;
+            document.getElementById('log-count').innerText = `0 EVENTS`;
+        }
+
+        function updateLiveStats() {
+            let totalAmps = 0;
+            let trippedCount = 0;
+            let totalBreakers = 0;
+
+            BOARD_TIERS.forEach(t => {
+                t.breakers.forEach(b => {
+                    totalBreakers++;
+                    if (b.state) {
+                        totalAmps += b.amps;
+                    } else {
+                        trippedCount++;
+                    }
+                });
+            });
+
+            document.getElementById('stat-load').innerText = `${totalAmps.toFixed(2)}A`;
+            document.getElementById('stat-tripped-count').innerText = `${trippedCount} / ${totalBreakers}`;
+
+            if (trippedCount > 0) {
+                document.getElementById('stat-tripped-count').className = "text-rose-400 font-bold animate-pulse";
+            } else {
+                document.getElementById('stat-tripped-count').className = "text-emerald-400 font-bold";
+            }
+        }
+
+        setInterval(() => {
+            const volt = 231 + Math.floor(Math.random() * 5);
+            document.getElementById('stat-voltage').innerText = `${volt}V AC`;
+            const temp = 41 + Math.floor(Math.random() * 3);
+            document.getElementById('stat-temp').innerText = `${temp}°C`;
+        }, 3500);
+
+       // -------------------------------------------------------------------------
+        // 9. OFFLINE EMERGENCY RUNBOOK MODAL
+        // -------------------------------------------------------------------------
+        function openRunbookModal() {
+            document.getElementById('runbook-modal').classList.remove('hidden');
+        }
+
+        function closeRunbookModal() {
+            document.getElementById('runbook-modal').classList.add('hidden');
+        }
+
+        function copyToClipboard(text) {
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                logMessage("CLIPBOARD", "அவசர கட்டளைகள் நகலெடுக்கப்பட்டன.", "cyan");
+            } catch (err) {
+                console.error("Copy failed", err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // -------------------------------------------------------------------------
+        // 10. BILINGUAL LANGUAGE LOCALIZATION TOGGLE
+        // -------------------------------------------------------------------------
+        function toggleLang() {
+            currentLang = currentLang === 'ta' ? 'en' : 'ta';
+            const t = I18N[currentLang];
+
+            document.getElementById('i18n-main-title').innerText = t.mainTitle;
+            document.getElementById('i18n-main-subtitle').innerText = t.mainSubtitle;
+            document.getElementById('i18n-reset-all').innerText = t.resetAll;
+            document.getElementById('i18n-runbook-btn').innerText = t.runbookBtn;
+            document.getElementById('lang-btn-text').innerText = t.langBtn;
+            document.getElementById('i18n-chaos-heading').innerText = t.chaosHeading;
+            document.getElementById('i18n-chaos-subtext').innerText = t.chaosSubtext;
+            document.getElementById('i18n-watchdog-label').innerText = t.watchdogLabel;
+
+            logMessage("LOCALE", `Language: ${currentLang.toUpperCase()}`, "slate");
+            renderBoard();
+        }
+
+        // -------------------------------------------------------------------------
+        // 11. BOOT SEQUENCE INITIALIZATION
+        // -------------------------------------------------------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            renderBoard();
+            logMessage("KERNEL", "Proxmox Linux 6.8-pve kernel booted.", "emerald");
+            logMessage("FAIL-SAFE", "Fail-safe watchdog active (3s timeout cutoff).", "cyan");
+
+            syncWithServer();
+            setInterval(syncWithServer, 3000);
+        });
+
+        // -------------------------------------------------------------------------
+        // FAIL-SAFE REAL-TIME SERVER SYNC CONTROLLER
+        // -------------------------------------------------------------------------
+        let serverWasDown = false;
+
+        function setBreakerState(tId, bId, isUp) {
+            const tier = BOARD_TIERS.find(t => t.id === tId);
+            if (!tier) return;
+            const b = tier.breakers.find(item => item.id === bId);
+            if (!b) return;
+            if (b.state !== isUp) {
+                b.state = isUp;
+                playSwitchClick(isUp ? 'on' : 'trip');
+                const bName = currentLang === 'ta' ? b.nameTa : b.nameEn;
+                if (isUp) {
+                    logMessage("SERVER-UP", `இயக்க நிலைக்கு மாறியது: [${bName}]`, "emerald");
+                } else {
+                    logMessage("SERVER-TRIP", `ட்ரிப் செய்யப்பட்டது: [${bName}]`, "rose");
+                }
+            }
+        }
+
+        function forceTripAll(reason) {
+            let anyTripped = false;
+            BOARD_TIERS.forEach(tier => {
+                tier.breakers.forEach(b => {
+                    if (b.state !== false) {
+                        b.state = false;
+                        anyTripped = true;
+                    }
+                });
+            });
+            if (anyTripped) {
+                playSwitchClick('trip');
+                renderBoard();
+            }
+            if (!serverWasDown) {
+                logMessage("CRITICAL-ALERT", `சர்வர் தொடர்பு இல்லை! (${reason}) - அனைத்து சுவிட்சுகளும் ட்ரிப் செய்யப்பட்டன!`, "rose");
+                serverWasDown = true;
+            }
+        }
+
+        function updateBoardWithServer(data) {
+            if (!data || !data.services) return;
+
+            // 1. இணையம் மீண்டும் கிடைத்தவுடன், அனைத்து சுவிட்சுகளையும் முதலில் இயல்பு நிலைக்கு (ON) திருப்புகிறோம்
+            mcbData.forEach(tier => {
+                tier.breakers.forEach(b => {
+                    b.state = true;
+                });
+            });
+
+            // 2. சர்வரிலிருந்து லைவாக வரும் 9 முக்கிய சேவைகளின் துல்லியமான நிலையை பொருத்துகிறோம்
+            // Tier 1 & 2: Nginx & Storage
+            if (data.services['web-nginx']) {
+                setBreakerState('tier-core', 'web-nginx', data.services['web-nginx'].active);
+            }
+            if (data.services['stor-hdd']) {
+                setBreakerState('tier-storage', 'stor-hdd', data.services['stor-hdd'].active);
+            }
+            if (data.services['stor-backup']) {
+                setBreakerState('tier-storage', 'stor-backup', data.services['stor-backup'].active);
+            }
+
+            // Tier 3: உங்கள் 6 கிளைன்ட் தளங்கள் (Portals)
+            const portalActive = data.services['web-nginx'] ? data.services['web-nginx'].active : false;
+            const portalIds = [
+                'app-waffle', 
+                'app-siddhan', 
+                'app-gega', 
+                'app-megas', 
+                'app-skcrackers', 
+                'app-roi'
+            ];
+            portalIds.forEach(id => {
+                setBreakerState('tier-portals', id, portalActive);
+            });
+
+            // 3. உடனடி லைவ் ஸ்கிரீன் அப்டேட் - அனைத்து 34 சுவிட்சுகளும் கண்முன்னே பச்சை நிறத்திற்கு மாறும்!
+            renderBoard();
+        }
+
+        let failureCount = 0;
+
+        async function syncWithServer() {
+            const controller = new AbortController();
+            // 2.5 விநாடிக்கு பதிலாக 5 விநாடிகள் அவகாசம் (நெட்வொர்க் நடுக்கத்தைத் தாங்க)
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            try {
+                const res = await fetch('https://breaker.corepulse.in/api/status', {
+                    headers: { 'Authorization': 'Bearer Aathava@7373k' },
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+                
+                failureCount = 0; // தொடர்பு கிடைத்ததும் எரர் கவுன்ட்டை ரீசெட் செய்கிறோம்
+                updateBoardWithServer(data);
+            } catch (err) {
+                clearTimeout(timeoutId);
+                failureCount++;
+
+                // தொடர்ந்து 2 முறை (10 விநாடிகள்) சர்வர் தொடர்பு கிடைக்கவில்லை என்றால் மட்டுமே ட்ரிப் செய்யும்
+                if (failureCount >= 2) {
+                    const reason = err.name === 'AbortError' ? "Timeout" : "Connection Closed / No Internet";
+                    forceTripAll(reason);
+                }
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // 🤖 SYSADMIN AI CHAT CONTROLLER
+        // -------------------------------------------------------------------------
+        function toggleAIChat() {
+            const win = document.getElementById('ai-chat-window');
+            const isHidden = win.style.display === 'none' || win.style.display === '';
+            win.style.display = isHidden ? 'flex' : 'none';
+            if (isHidden) {
+                document.getElementById('ai-user-input').focus();
+            }
+        }
+
+        async function sendAIMessage() {
+            const input = document.getElementById('ai-user-input');
+            const msgBox = document.getElementById('ai-messages');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const userDiv = document.createElement('div');
+            userDiv.style = "align-self: flex-end; background: #10b981; color: white; padding: 8px 12px; border-radius: 8px; max-width: 85%; word-break: break-word;";
+            userDiv.innerText = text;
+            msgBox.appendChild(userDiv);
+            input.value = '';
+            msgBox.scrollTop = msgBox.scrollHeight;
+
+            const loadingDiv = document.createElement('div');
+            loadingDiv.style = "align-self: flex-start; background: #1e293b; color: #94a3b8; padding: 8px 12px; border-radius: 8px; max-width: 85%; font-style: italic;";
+            loadingDiv.innerText = "பரிசீலிக்கிறது...";
+            msgBox.appendChild(loadingDiv);
+            msgBox.scrollTop = msgBox.scrollHeight;
+
+            try {
+                const res = await fetch('https://breaker.corepulse.in/api/ai/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer Aathava@7373k'
+                    },
+                    body: JSON.stringify({ message: text })
+                });
+
+                if (!res.ok) throw new Error("HTTP " + res.status);
+                const data = await res.json();
+                loadingDiv.innerText = data.reply || "பதில் பெற முடியவில்லை.";
+                loadingDiv.style.fontStyle = "normal";
+                loadingDiv.style.color = "#cbd5e1";
+            } catch (err) {
+                loadingDiv.innerText = "சர்வர் ஆஃப்லைனில் உள்ளது அல்லது இணைய இணைப்பு இல்லை!";
+                loadingDiv.style.color = "#ef4444";
+            }
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
+    </script>
+
+    <!-- ========================================== -->
+    <!-- 🤖 FLOATING SYSADMIN AI CHAT WIDGET UI     -->
+    <!-- ========================================== -->
+    <div id="ai-chat-bubble" onclick="toggleAIChat()" style="position: fixed; bottom: 25px; right: 25px; width: 56px; height: 56px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.45); z-index: 99999; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.08)'" onmouseout="this.style.transform='scale(1)'">
+        <span style="font-size: 26px;">🤖</span>
+    </div>
+
+    <div id="ai-chat-window" style="display: none; position: fixed; bottom: 92px; right: 25px; width: 340px; height: 450px; background: #0f172a; border: 1px solid #334155; border-radius: 14px; box-shadow: 0 10px 35px rgba(0,0,0,0.6); z-index: 99999; flex-direction: column; overflow: hidden; font-family: ui-sans-serif, system-ui, sans-serif;">
+        <div style="background: #1e293b; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 18px;">🤖</span>
+                <span style="color: #f8fafc; font-weight: 600; font-size: 14px;">SysAdmin AI ஏஜென்ட்</span>
+            </div>
+            <span onclick="toggleAIChat()" style="color: #94a3b8; cursor: pointer; font-size: 18px; font-weight: bold; padding: 0 4px;">✕</span>
+        </div>
+
+        <div id="ai-messages" style="flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; font-size: 13px; line-height: 1.5;">
+            <div style="align-self: flex-start; background: #1e293b; color: #cbd5e1; padding: 8px 12px; border-radius: 8px; max-width: 85%; border: 1px solid #334155;">
+                வணக்கம்! நான் உங்கள் சர்வர் AI ஏஜென்ட். சர்வர் நிலை குறித்து என்ன வேண்டுமானாலும் தமிழில் கேளுங்கள்.
+            </div>
+        </div>
+
+        <div style="padding: 10px; background: #1e293b; display: flex; gap: 6px; border-top: 1px solid #334155;">
+            <input id="ai-user-input" type="text" placeholder="கேள்வி கேளுங்கள் (எ.கா: RAM எவ்ளோ?)" onkeypress="if(event.key === 'Enter') sendAIMessage()" style="flex: 1; background: #0f172a; border: 1px solid #475569; border-radius: 6px; padding: 8px 10px; color: #f8fafc; font-size: 13px; outline: none;" />
+            <button onclick="sendAIMessage()" style="background: #10b981; border: none; color: white; padding: 0 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 14px;">➤</button>
+        </div>
+    </div>
+</body>
+</html>
