@@ -1464,19 +1464,6 @@ function updateBoardWithServer(data) {
     renderBoard();
 }
 
-async function syncWithServer() {
-    try {
-        const res = await fetch('https://breaker.corepulse.in/api/status', {
-            headers: { 'Authorization': 'Bearer Aathava@7373k' }
-        });
-        if (!res.ok) throw new Error("HTTP " + res.status);
-        const data = await res.json();
-        updateBoardWithServer(data);
-    } catch (err) {
-        console.error("சர்வர் தொடர்பு பிழை:", err);
-    }
-}
-
 // 3 வினாடிக்கு ஒருமுறை சர்வரோடு தொடர்ச்சியாக ஒத்திசைக்க
 setInterval(syncWithServer, 3000);
 syncWithServer();
@@ -1713,10 +1700,17 @@ syncWithServer();
         }
 
         let failureCount = 0;
+        let isSyncing = false;
+        let syncTimeout = null;
 
         async function syncWithServer() {
+            if (isSyncing) return;
+            isSyncing = true;
+
+            if (syncTimeout) clearTimeout(syncTimeout);
+
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
 
             try {
                 const res = await fetch('https://breaker.corepulse.in/api/status', {
@@ -1734,12 +1728,15 @@ syncWithServer();
                 clearTimeout(timeoutId);
                 failureCount++;
 
-                if (failureCount >= 2) {
+                if (failureCount >= 3) {
                     const reason = err.name === 'AbortError' ? "Timeout" : "Connection Closed / No Internet";
                     forceTripAll(reason);
                 }
             } finally {
-                setTimeout(syncWithServer, 2000);
+                isSyncing = false;
+                // சர்வர் ரெஸ்பான்ஸ் தந்தாலும் சரி, எரர் வந்தாலும் சரி... 
+                // அடுத்த 5 விநாடிகள் வரை எந்த புதிய ரிக்வஸ்ட்டும் கிளம்பாது
+                syncTimeout = setTimeout(syncWithServer, 5000);
             }
         }
 
