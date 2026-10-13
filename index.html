@@ -1641,18 +1641,23 @@ syncWithServer();
 
        function forceTripAll(reason) {
             let anyTripped = false;
-            mcbData.forEach(tier => {
-                tier.breakers.forEach(b => {
-                    if (b.state !== false) {
-                        b.state = false;
-                        anyTripped = true;
-                    }
+            
+            if (typeof BOARD_TIERS !== 'undefined') {
+                BOARD_TIERS.forEach(tier => {
+                    tier.breakers.forEach(b => {
+                        if (b.state !== false) {
+                            b.state = false;
+                            anyTripped = true;
+                        }
+                    });
                 });
-            });
+            }
+
             if (anyTripped) {
                 playSwitchClick('trip');
-                renderBoard();
+                if (typeof renderBoard === 'function') renderBoard();
             }
+
             if (!serverWasDown) {
                 logMessage("CRITICAL-ALERT", `சர்வர் தொடர்பு இல்லை! (${reason}) - அனைத்து சுவிட்சுகளும் ட்ரிப் செய்யப்பட்டன!`, "rose");
                 serverWasDown = true;
@@ -1662,47 +1667,49 @@ syncWithServer();
         function updateBoardWithServer(data) {
             if (!data || !data.services) return;
 
-            // 1. அனைத்து 34 சுவிட்சுகளின் டேட்டாவையும் நேரடியா மாற்றுதல் (UI freeze ஆகாது)
-            for (let t = 0; t < mcbData.length; t++) {
-                for (let b = 0; b < mcbData[t].breakers.length; b++) {
-                    mcbData[t].breakers[b].state = true;
+            if (typeof BOARD_TIERS !== 'undefined') {
+                // 1. அனைத்து 34 சுவிட்சுகளையும் ஆன் செய்கிறோம்
+                BOARD_TIERS.forEach(tier => {
+                    tier.breakers.forEach(b => {
+                        b.state = true;
+                    });
+                });
+
+                // 2. சர்வர் தரும் 9 நேரலை நிலைகளை மட்டும் துல்லியமாக பொருத்துகிறோம்
+                const setDirect = (tierId, bId, val) => {
+                    const tier = BOARD_TIERS.find(x => x.id === tierId);
+                    if (tier) {
+                        const brk = tier.breakers.find(x => x.id === bId);
+                        if (brk) brk.state = val;
+                    }
+                };
+
+                if (data.services['web-nginx']) {
+                    setDirect('tier-core', 'web-nginx', data.services['web-nginx'].active);
                 }
-            }
-
-            // 2. சர்வர் தரும் நேரலை சர்வீஸ்களின் நிலையை பொருத்துதல்
-            const setDirect = (tierId, bId, val) => {
-                const tier = mcbData.find(x => x.id === tierId);
-                if (tier) {
-                    const brk = tier.breakers.find(x => x.id === bId);
-                    if (brk) brk.state = val;
+                if (data.services['stor-hdd']) {
+                    setDirect('tier-storage', 'stor-hdd', data.services['stor-hdd'].active);
                 }
-            };
+                if (data.services['stor-backup']) {
+                    setDirect('tier-storage', 'stor-backup', data.services['stor-backup'].active);
+                }
 
-            if (data.services['web-nginx']) {
-                setDirect('tier-core', 'web-nginx', data.services['web-nginx'].active);
-            }
-            if (data.services['stor-hdd']) {
-                setDirect('tier-storage', 'stor-hdd', data.services['stor-hdd'].active);
-            }
-            if (data.services['stor-backup']) {
-                setDirect('tier-storage', 'stor-backup', data.services['stor-backup'].active);
+                // கிளைன்ட் தளங்கள் (Portals)
+                const portalActive = data.services['web-nginx'] ? data.services['web-nginx'].active : false;
+                ['app-waffle', 'app-siddhan', 'app-gega', 'app-megas', 'app-skcrackers', 'app-roi'].forEach(id => {
+                    setDirect('tier-portals', id, portalActive);
+                });
             }
 
-            // போர்டல் தளங்கள்
-            const portalActive = data.services['web-nginx'] ? data.services['web-nginx'].active : false;
-            ['app-waffle', 'app-siddhan', 'app-gega', 'app-megas', 'app-skcrackers', 'app-roi'].forEach(id => {
-                setDirect('tier-portals', id, portalActive);
-            });
-
-            // 3. சர்வர் மீண்டும் ஆன் ஆனதை ஒருமுறை மட்டும் லாக் செய்தல்
+            // 3. சர்வர் தொடர்பு மீண்டும் கிடைத்ததும் ஒருமுறை லாக் செய்து கிளிக் சத்தம்
             if (serverWasDown) {
-                logMessage("SERVER-RECOVER", "சர்வர் தொடர்பு மீண்டும் கிடைத்தது! அனைத்து சுவிட்சுகளும் இயக்க நிலைக்கு மாறின.", "emerald");
+                logMessage("SERVER-RECOVER", "சர்வர் தொடர்பு மீண்டும் கிடைத்தது! அனைத்து சுவிட்சுகளும் லைவாக இயல்பு நிலைக்கு மாறின.", "emerald");
                 playSwitchClick('on');
                 serverWasDown = false;
             }
 
-            // 4. முழு போர்டையும் ஒரே அடியில் திரையில் வரைதல்
-            renderBoard();
+            // 4. திரையில் 34 சுவிட்சுகளையும் ரீ-ரெண்டர் செய்கிறோம்
+            if (typeof renderBoard === 'function') renderBoard();
         }
 
         let failureCount = 0;
@@ -1727,13 +1734,11 @@ syncWithServer();
                 clearTimeout(timeoutId);
                 failureCount++;
 
-                // தொடர்ந்து 2 முறை தொடர்பு இல்லை என்றால் மட்டுமே ட்ரிப்
                 if (failureCount >= 2) {
                     const reason = err.name === 'AbortError' ? "Timeout" : "Connection Closed / No Internet";
                     forceTripAll(reason);
                 }
             } finally {
-                // நெட்வொர்க் எரர் வந்தாலும் நிக்காமல் தொடர்ந்து 2 விநாடிக்கு ஒருமுறை பிங் பண்ணும் லூப்
                 setTimeout(syncWithServer, 2000);
             }
         }
